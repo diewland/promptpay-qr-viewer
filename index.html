@@ -1,23 +1,38 @@
 <script>
   function extract_pp_text(pp_text){
     var patt = "^00020101021229370016A000000677010111(.+)5303764(.*)5802TH.+$";
+    var type_map = {
+      '01': 'Telephone Number',
+      '02': 'Thai ID Card',
+      '03': 'e-Wallet ID',
+    };
+
     var data = pp_text.match(patt);
     if((data !== null)&&(data.length == 3)){
-      var acc_id = null;
-      var amount = null;
-
       // extract account-id
-      // TODO detect acc_type 01, 02, 03
-      acc_id = data[1];
-
-      // extract amount
-      if(data[2]){
-        // TODO detect and cast amount
-        amount = data[2];
+      // tel-no       011300668xyyyzzzz
+      // card-id      0213xxxxxxxxxxxxx
+      // e-wallet-id  0315xxxxxxxxxxxxxxx
+      var acc_id   = data[1];
+      var acc_type = acc_id.substr(0, 2);
+      var acc_val  = acc_id.substr(4);
+      if(acc_type == '01'){
+        acc_val = '0'+ acc_val.substr(4);
       }
 
+      // extract amount
+      var amount = null;
+      if(data[2]){
+        amount = data[2];
+        if(amount.substr(0, 2) == '54'){
+          amount  = amount.substr(4);
+        }
+      }
+
+      // build return object
       return {
-        id:     acc_id,
+        id:     acc_val,
+        type:   type_map[acc_type],
         amount: amount,
       }
     }
@@ -25,10 +40,14 @@
   }
 
   // 00020101021229370016A000000677010111--01130066840304251--5303764--540250--5802TH63041338
-  var tel_with_amount    = "00020101021229370016A0000006770101110113006684030425153037645402505802TH63041338";
-  var tel_without_amount = "00020101021229370016A0000006770101110113006684030425153037645802TH6304XXXX";
+  var tel_1     = "00020101021229370016A0000006770101110113006684030425153037645402505802TH63041338";
+  var tel_2     = "00020101021229370016A0000006770101110113006684030425153037645802TH6304XXXX";
+  var thai_id   = "00020101021229370016A0000006770101110213123456789012353037645406123.455802TH6304XXXX";
+  var ewallet   = "00020101021229370016A000000677010111031512345123456789053037645406123.455802TH6304XXXX";
 
-  console.log(extract_pp_text(tel_with_amount));
-  console.log(extract_pp_text(tel_without_amount));
+  console.log(extract_pp_text(tel_1));
+  console.log(extract_pp_text(tel_2));
   console.log(extract_pp_text("some text"));
+  console.log(extract_pp_text(thai_id));
+  console.log(extract_pp_text(ewallet));
 </script>
