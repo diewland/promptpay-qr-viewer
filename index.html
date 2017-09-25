@@ -1,0 +1,34 @@
+<script>
+  function extract_pp_text(pp_text){
+    var patt = "^00020101021229370016A000000677010111(.+)5303764(.*)5802TH.+$";
+    var data = pp_text.match(patt);
+    if((data !== null)&&(data.length == 3)){
+      var acc_id = null;
+      var amount = null;
+
+      // extract account-id
+      // TODO detect acc_type 01, 02, 03
+      acc_id = data[1];
+
+      // extract amount
+      if(data[2]){
+        // TODO detect and cast amount
+        amount = data[2];
+      }
+
+      return {
+        id:     acc_id,
+        amount: amount,
+      }
+    }
+    return null;
+  }
+
+  // 00020101021229370016A000000677010111--01130066840304251--5303764--540250--5802TH63041338
+  var tel_with_amount    = "00020101021229370016A0000006770101110113006684030425153037645402505802TH63041338";
+  var tel_without_amount = "00020101021229370016A0000006770101110113006684030425153037645802TH6304XXXX";
+
+  console.log(extract_pp_text(tel_with_amount));
+  console.log(extract_pp_text(tel_without_amount));
+  console.log(extract_pp_text("some text"));
+</script>
