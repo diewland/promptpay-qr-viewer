@@ -13,38 +13,7 @@
         <h1 class="title">
           PromptPayQR Viewer
         </h1>
-        <p class="subtitle">
-          Let's see what inside PromptPayQR
-        </p>
         <video id="preview"></video>
-        <table class='table is-fullwidth'>
-          <thead>
-            <tr>
-              <td>field</td>
-              <td>value</td>
-            </tr>
-          </thead>
-          <tr>
-            <td>type</td>
-            <td><span id='type_label'></span></td>
-          </tr>
-          <tr>
-            <td>type code</td>
-            <td><span id='type'></span></td>
-          </tr>
-          <tr>
-            <td>account</td>
-            <td><span id='acc_id'></span></td>
-          </tr>
-          <tr>
-            <td>amount</td>
-            <td><span id='amount'></span></td>
-          </tr>
-          <tr>
-            <td>raw text</td>
-            <td><a id='raw' class="button is-small">Not Found</a></td>
-          </tr>
-        </table>
         <a href='https://github.com/diewland/promptpay-qr-viewer' target='_blank'>github</a>
       </div>
     </section>
@@ -53,27 +22,29 @@
     <script type='text/javascript' src='./pptext2obj.js'></script>
 
     <script>
-      // bind raw button
-      var GLOB_RAW = 'Not Found';
-      document.getElementById('raw').addEventListener('click', function(){
-        alert(GLOB_RAW);
+      var scanner = new Instascan.Scanner({
+        video: document.getElementById('preview'),
+        mirror: false, // for back camera
       });
-
-      // qr scanner
-      var scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
       scanner.addListener('scan', function (content) {
         console.log(content);
 
-        // update raw text button
-        GLOB_RAW = content;
-        document.getElementById('raw').innerHTML = '...' + content.substr(40, 20) + '...';
-
-        // update table
         var obj = extract_pp_text(content);
         if(obj){
-          for(k in obj){
-            document.getElementById(k).innerHTML = obj[k];
-          }
+          alert(
+            "PromptPay QR Viewer\n"
+            + "\n"
+            + "Account Type : "+ obj.type_label +"\n"
+            + "Account ID : "+ obj.acc_id +"\n"
+            + "Amount : "+ obj.amount
+          );
+        }
+        else {
+          alert(
+            "Invalid format\n"
+            + "\n"
+            + content
+          );
         }
       });
       Instascan.Camera.getCameras().then(function (cameras) {
