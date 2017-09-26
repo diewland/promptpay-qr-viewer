@@ -1,53 +1,92 @@
-<script>
-  function extract_pp_text(pp_text){
-    var patt = "^00020101021229370016A000000677010111(.+)5303764(.*)5802TH.+$";
-    var type_map = {
-      '01': 'Telephone Number',
-      '02': 'Thai ID Card',
-      '03': 'e-Wallet ID',
-    };
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PromptPayQR Viewer</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.3/css/bulma.min.css">
+  </head>
+  <body>
+    <section class="section">
+      <div class="container">
+        <h1 class="title">
+          PromptPayQR Viewer
+        </h1>
+        <p class="subtitle">
+          Let's see what inside PromptPayQR
+        </p>
+        <video id="preview"></video>
+        <table class='table is-fullwidth'>
+          <thead>
+            <tr>
+              <td>field</td>
+              <td>value</td>
+            </tr>
+          </thead>
+          <tr>
+            <td>type</td>
+            <td><span id='type_label'></span></td>
+          </tr>
+          <tr>
+            <td>type code</td>
+            <td><span id='type'></span></td>
+          </tr>
+          <tr>
+            <td>account</td>
+            <td><span id='acc_id'></span></td>
+          </tr>
+          <tr>
+            <td>amount</td>
+            <td><span id='amount'></span></td>
+          </tr>
+          <tr>
+            <td>raw text</td>
+            <td><a id='raw' class="button is-small">Not Found</a></td>
+          </tr>
+        </table>
+        <a href='https://github.com/diewland/promptpay-qr-viewer' target='_blank'>github</a>
+      </div>
+    </section>
 
-    var data = pp_text.match(patt);
-    if((data !== null)&&(data.length == 3)){
-      // extract account-id
-      // tel-no       011300668xyyyzzzz
-      // card-id      0213xxxxxxxxxxxxx
-      // e-wallet-id  0315xxxxxxxxxxxxxxx
-      var acc_id   = data[1];
-      var acc_type = acc_id.substr(0, 2);
-      var acc_val  = acc_id.substr(4);
-      if(acc_type == '01'){
-        acc_val = '0'+ acc_val.substr(4);
-      }
+    <script type='text/javascript' src='./instascan.min.js'></script>
+    <script type='text/javascript' src='./pptext2obj.js'></script>
 
-      // extract amount
-      var amount = null;
-      if(data[2]){
-        amount = data[2];
-        if(amount.substr(0, 2) == '54'){
-          amount  = amount.substr(4);
+    <script>
+      // bind raw button
+      var GLOB_RAW = 'Not Found';
+      document.getElementById('raw').addEventListener('click', function(){
+        alert(GLOB_RAW);
+      });
+
+      // qr scanner
+      var scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+      scanner.addListener('scan', function (content) {
+        console.log(content);
+
+        // update raw text button
+        GLOB_RAW = content;
+        document.getElementById('raw').innerHTML = '...' + content.substr(40, 20) + '...';
+
+        // update table
+        var obj = extract_pp_text(content);
+        if(obj){
+          for(k in obj){
+            document.getElementById(k).innerHTML = obj[k];
+          }
         }
-      }
+      });
+      Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+          // last camera should be back camera ?
+          scanner.start(cameras[cameras.length-1]);
+        } else {
+          console.error('No cameras found.');
+        }
+      }).catch(function (e) {
+        console.error(e);
+      });
+    </script>
 
-      // build return object
-      return {
-        id:     acc_val,
-        type:   type_map[acc_type],
-        amount: amount,
-      }
-    }
-    return null;
-  }
-
-  // 00020101021229370016A000000677010111--01130066840304251--5303764--540250--5802TH63041338
-  var tel_1     = "00020101021229370016A0000006770101110113006684030425153037645402505802TH63041338";
-  var tel_2     = "00020101021229370016A0000006770101110113006684030425153037645802TH6304XXXX";
-  var thai_id   = "00020101021229370016A0000006770101110213123456789012353037645406123.455802TH6304XXXX";
-  var ewallet   = "00020101021229370016A000000677010111031512345123456789053037645406123.455802TH6304XXXX";
-
-  console.log(extract_pp_text(tel_1));
-  console.log(extract_pp_text(tel_2));
-  console.log(extract_pp_text("some text"));
-  console.log(extract_pp_text(thai_id));
-  console.log(extract_pp_text(ewallet));
-</script>
+  </body>
+</html>
