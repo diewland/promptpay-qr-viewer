@@ -1,79 +1,68 @@
-function extract_pp_text(pp_text){
-  var patt = "^00020101021229370016A000000677010111(.+)5303764(.*)5802TH.+$";
-  var type_map = {
+window.PPText2Obj = {
+
+  PROMPTPAY_APP_ID: 'A000000677010111',
+  QR_TYPE: {
+    '11': 'Never expire QR-Code',
+    '12': 'One-time QR-Code',
+  },
+  ACCOUNT_TYPE: {
     '01': 'Telephone Number',
     '02': 'Thai ID Card',
     '03': 'e-Wallet ID',
-  };
+  },
 
-  var data = pp_text.match(patt);
-  if((data !== null)&&(data.length == 3)){
-    // extract account-id
-    // tel-no       011300668xyyyzzzz
-    // card-id      0213xxxxxxxxxxxxx
-    // e-wallet-id  0315xxxxxxxxxxxxxxx
-    var acc_id   = data[1];
-    var acc_type = acc_id.substr(0, 2);
-    var acc_val  = acc_id.substr(4);
-    if(acc_type == '01'){
-      acc_val = '0'+ acc_val.substr(4);
+  _decode: function(pp_text){
+    var pp_obj = {};
+    var field_no   = '';
+    var field_size = '';
+    for(var i=0; i<pp_text.length; i++){
+      // get field no
+      if(!field_no){
+        field_no = pp_text.substr(i, 2);
+        // console.log(i, field_no, field_size);
+        i += 1;
+      }
+      // get field size
+      else if(!field_size){
+        field_size = parseInt(pp_text.substr(i, 2));
+        // console.log(i, field_no, field_size);
+        i += 1;
+      }
+      // get field value
+      else {
+        pp_obj[field_no] = pp_text.substr(i, field_size);
+        // console.log(i, field_no, field_size, pp_obj[field_no]);
+        // shift to next field
+        i += (field_size-1);
+        field_no   = '';
+        field_size = '';
+      }
     }
+    return pp_obj;
+  },
 
-    // extract amount
-    var amount = null;
-    if(data[2]){
-      amount = data[2];
-      if(amount.substr(0, 2) == '54'){
-        amount  = amount.substr(4);
+  decode: function(pp_text){
+    var obj = this._decode(pp_text);
+
+    // extract more field 29
+    var merchant_info = obj['29'] || '';
+    var merchant_obj = this._decode(merchant_info);
+    if(merchant_obj['00'] != this.PROMPTPAY_APP_ID){
+      return null;
+    }
+    for(var k in merchant_obj){
+      if(k != '00'){
+        obj['29_acc_type'] = k;
+        obj['29_acc_no']   = merchant_obj[k];
       }
     }
 
-    // build return object
-    return {
-      type:       acc_type,
-      type_label: type_map[acc_type],
-      acc_id:     acc_val,
-      amount:     amount,
+    // what inside field 31 ?
+    if(obj['31']){
+      console.log(this._decode(obj['31']));
     }
-  }
-  return null;
-}
 
-//            01 23 45 67 89 01 23 45 6789012345678901234567890123456789012 34 56 789 01 23 456789 01 23 45 67 89 0123
-// var txt = "00-02-01|01-02-12|29-37-0016A00000067701011101130066840304251|53-03-764|54-06-123.45|58-02-TH|63-04-48DD";
-// var txt = "00020101021129370016A0000006770101110113006683626369631460016A000000677010113010303002151000000000003565204581453037645802TH5913CREPE SOMWANG6007BANGKOK6105102406212070804000031630449EE";
-function decode_pp_text(pp_text){
+    return obj;
+  },
 
-  var pp_obj = {};
-
-  var field_no   = '';
-  var field_size = '';
-
-  for(var i=0; i<pp_text.length; i++){
-    var c = pp_text[i];
-    // console.log(i, c);
-
-    // get field no
-    if(field_no.length < 2){
-      field_no += c;
-    }
-    // get field size
-    else if(field_size.length < 2){
-      field_size += c;
-    }
-    // get field value
-    else {
-      field_size = parseInt(field_size);
-      pp_obj[field_no] = pp_text.substr(i, field_size);
-
-      console.log(i, field_no, field_size, pp_obj[field_no]);
-
-      // prepare for next field
-      field_no   = '';
-      field_size = '';
-      i += field_size-1;
-    }
-  }
-
-  return pp_obj;
-}
+};

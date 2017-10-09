@@ -27,15 +27,23 @@
       scanner.addListener('scan', function (content) {
         console.log(content);
 
-        var obj = extract_pp_text(content);
+        var obj = PPText2Obj.decode(content);
         if(obj){
-          alert(
-            "PromptPay QR Viewer\n"
-            + "\n"
-            + "Account Type : "+ obj.type_label +"\n"
-            + "Account ID : "+ obj.acc_id +"\n"
-            + "Amount : "+ obj.amount
-          );
+          var s = [];
+          if(obj['59']){
+            s.push("Merchant Name : " + obj['59']);
+          }
+          s.push("QR Type : " + PPText2Obj.QR_TYPE[obj['01']]);
+          s.push("Account Type : " + PPText2Obj.ACCOUNT_TYPE[obj['29_acc_type']]);
+          s.push("Account No : " + obj['29_acc_no']);
+          if(obj['54']){
+            s.push("Amount : " + obj['54']);
+          }
+          else {
+            s.push("Amount : N/A");
+          }
+          console.log(obj);
+          alert(s.join("\n"));
         }
         else {
           alert(
