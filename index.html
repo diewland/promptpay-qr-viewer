@@ -34,8 +34,18 @@
             s.push("Merchant Name : " + obj['59']);
           }
           s.push("QR Type : " + PPText2Obj.QR_TYPE[obj['01']]);
-          s.push("Account Type : " + PPText2Obj.ACCOUNT_TYPE[obj['29_acc_type']]);
-          s.push("Account No : " + obj['29_acc_no']);
+          if(obj['29_acc_type']){
+            s.push("Account Type : " + PPText2Obj.ACCOUNT_TYPE[obj['29_acc_type']]);
+          }
+          if(obj['29_acc_no']){
+            s.push("Account No : " + obj['29_acc_no']);
+          }
+          if(obj['30_biller_id']){
+            s.push("Biller ID : " + obj['30_biller_id']);
+          }
+          if(obj['30_ref_no']){
+            s.push("Ref No : " + obj['30_ref_no']);
+          }
           if(obj['54']){
             s.push("Amount : " + obj['54']);
           }

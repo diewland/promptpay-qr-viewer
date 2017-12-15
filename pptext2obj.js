@@ -1,6 +1,7 @@
 window.PPText2Obj = {
 
-  PROMPTPAY_APP_ID: 'A000000677010111',
+  PP_APP_ID_USER:     'A000000677010111',
+  PP_APP_ID_MERCHANT: 'A000000677010112',
   QR_TYPE: {
     '11': 'Never expire QR-Code',
     '12': 'One-time QR-Code',
@@ -44,16 +45,35 @@ window.PPText2Obj = {
   decode: function(pp_text){
     var obj = this._decode(pp_text);
 
-    // extract more field 29
-    var merchant_info = obj['29'] || '';
-    var merchant_obj = this._decode(merchant_info);
-    if(merchant_obj['00'] != this.PROMPTPAY_APP_ID){
-      return null;
+    // user: extract more field 29
+    var merchant_info = obj['29'] || null;
+    if(merchant_info != null){
+      var merchant_obj = this._decode(merchant_info);
+      if(merchant_obj['00'] != this.PP_APP_ID_USER){
+        return null;
+      }
+      for(var k in merchant_obj){
+        if(k != '00'){
+          obj['29_acc_type'] = k;
+          obj['29_acc_no']   = merchant_obj[k];
+        }
+      }
     }
-    for(var k in merchant_obj){
-      if(k != '00'){
-        obj['29_acc_type'] = k;
-        obj['29_acc_no']   = merchant_obj[k];
+
+    // merchant: extract more field 30
+    var merchant_info = obj['30'] || null;
+    if(merchant_info != null){
+      var merchant_obj = this._decode(merchant_info);
+      if(merchant_obj['00'] != this.PP_APP_ID_MERCHANT){
+        return null;
+      }
+      for(var k in merchant_obj){
+        if(k == '01'){
+          obj['30_biller_id'] = merchant_obj[k];
+        }
+        else if(k == '02'){
+          obj['30_ref_no'] = merchant_obj[k];
+        }
       }
     }
 
