@@ -72,7 +72,18 @@ window.PPText2Obj = {
           obj['30_biller_id'] = merchant_obj[k];
         }
         else if(k == '02'){
-          obj['30_ref_no'] = merchant_obj[k];
+          obj['30_ref_1'] = merchant_obj[k];
+        }
+      }
+    }
+
+    // merchant: extract more field 62
+    var merchant_info = obj['62'] || null;
+    if(merchant_info != null){
+      var merchant_obj = this._decode(merchant_info);
+      for(var k in merchant_obj){
+        if(k == '07'){
+          obj['62_ref_3'] = merchant_obj[k];
         }
       }
     }
