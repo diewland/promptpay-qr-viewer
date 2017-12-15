@@ -77,6 +77,11 @@ window.PPText2Obj = {
       }
     }
 
+    // what inside field 31 ?
+    if(obj['31']){
+      console.log(this._decode(obj['31']));
+    }
+
     // merchant: extract more field 62
     var merchant_info = obj['62'] || null;
     if(merchant_info != null){
@@ -86,11 +91,6 @@ window.PPText2Obj = {
           obj['62_ref_3'] = merchant_obj[k];
         }
       }
-    }
-
-    // what inside field 31 ?
-    if(obj['31']){
-      console.log(this._decode(obj['31']));
     }
 
     return obj;
