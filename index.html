@@ -55,6 +55,13 @@
           else {
             s.push("Amount : N/A");
           }
+          // print all fields
+          s.push('');
+          s.push('##### DEBUG #####');
+          s.push('');
+          for(k in obj){
+            s.push(k + ' : ' + obj[k]);
+          }
           console.log(obj);
           alert(s.join("\n"));
         }
