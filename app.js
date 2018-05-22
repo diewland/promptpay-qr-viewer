@@ -21,8 +21,11 @@ scanner.addListener('scan', function (content) {
     if(obj['30_biller_id']){
       s.push("Biller ID : " + obj['30_biller_id']);
     }
-    if(obj['30_ref_1']){
-      s.push("Ref 1 : " + obj['30_ref_1']);
+    if(obj['30_merchant_id']){
+      s.push("Merchant ID : " + obj['30_merchant_id']);
+    }
+    if(obj['31_txn_id']){
+      s.push("Transaction ID : " + obj['31_txn_id']);
     }
     if(obj['62_ref_3']){
       s.push("Ref 3 : " + obj['62_ref_3']);

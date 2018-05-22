@@ -72,25 +72,40 @@ window.PPText2Obj = {
           obj['30_biller_id'] = merchant_obj[k];
         }
         else if(k == '02'){
-          obj['30_ref_1'] = merchant_obj[k];
+          obj['30_merchant_id'] = merchant_obj[k];
+        }
+        else if(k == '03'){
+          obj['30_txn_id'] = merchant_obj[k];
         }
       }
+      obj['30_obj'] = merchant_obj;
     }
 
-    // what inside field 31 ?
-    if(obj['31']){
-      console.log(this._decode(obj['31']));
+    // merchant: extract more field 31
+    var merchant_info = obj['31'] || null;
+    if(merchant_info != null){
+      var merchant_obj = this._decode(merchant_info);
+      for(var k in merchant_obj){
+        if(k == '02'){
+          obj['31_merchant_id'] = merchant_obj[k];
+        }
+        else if(k == '04'){
+          obj['31_txn_id'] = merchant_obj[k];
+        }
+      }
+      obj['31_obj'] = merchant_obj;
     }
 
     // merchant: extract more field 62
     var merchant_info = obj['62'] || null;
     if(merchant_info != null){
       var merchant_obj = this._decode(merchant_info);
-      for(var k in merchant_obj){
+      for(var k in erchant_obj){
         if(k == '07'){
           obj['62_ref_3'] = merchant_obj[k];
         }
       }
+      obj['62_obj'] = merchant_obj;
     }
 
     return obj;
