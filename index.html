@@ -15,8 +15,19 @@
         <a href='https://github.com/diewland/promptpay-qr-viewer' target='_blank'>github</a>
       </div>
     </div>
-    <script type='text/javascript' src='./instascan.min.js'></script>
     <script type='text/javascript' src='./pptext2obj.js'></script>
     <script type='text/javascript' src='./app.js'></script>
+    <script type="module">
+
+      import QrScanner from "./qr-scanner.min.js";
+      QrScanner.WORKER_PATH = "./qr-scanner-worker.min.js";
+
+      const video = document.getElementById('preview');
+      const scanner = new QrScanner(video, result => {
+        extract_pp_info(result);
+      });
+      scanner.start();
+
+    </script>
   </body>
 </html>

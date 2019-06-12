@@ -1,10 +1,4 @@
-var scanner = new Instascan.Scanner({
-  video: document.getElementById('preview'),
-  mirror: false, // for back camera
-});
-scanner.addListener('scan', function (content) {
-  console.log(content);
-
+function extract_pp_info(content){
   var obj = PPText2Obj.decode(content);
   if(obj){
     var s = [];
@@ -53,14 +47,4 @@ scanner.addListener('scan', function (content) {
       + content
     );
   }
-});
-Instascan.Camera.getCameras().then(function (cameras) {
-  if (cameras.length > 0) {
-    // last camera should be back camera ?
-    scanner.start(cameras[cameras.length-1]);
-  } else {
-    console.error('No cameras found.');
-  }
-}).catch(function (e) {
-  console.error(e);
-});
+}
