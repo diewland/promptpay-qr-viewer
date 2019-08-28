@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>PromptPayQR Viewer</title>
+  </head>
+  <body>
+
+    <div class='container'>
+      <div class='row'>
+        <div class='col-md'>
+          <h1>Camera</h1>
+          <video id="preview" width='100%'></video>
+        </div>
+        <div class='col-md'>
+          <h1>Decode</h1>
+          <textarea id='text' class="form-control" rows='3'></textarea>
+          <input id='btn-decode' class='btn btn-primary btn-lg btn-block my-3' type='button' value='Decode' />
+          <table id='output' class='table'>
+            <tr>
+              <th>Key</th>
+              <th>Value</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <!-- promptpay script -->
+    <script type='text/javascript' src='./pptext2obj.js'></script>
+    <script>
+      // set sample pp text
+      let text = "00020101021129370016A000000677010111011300668912345675802TH54025053037646304A819";
+      $('#text').val(text);
+
+      // bind click
+      $('#btn-decode').click(() => {
+        let t = $('#text').val();
+        if(t){
+          let obj = PPText2Obj.decode(t);
+          let keys = Object.keys(obj).sort();
+          $('.output-row').remove();
+          keys.forEach((k) => {
+            $('#output').append(`<tr class='output-row'>
+              <td>${k}</td>
+              <td>${obj[k]}</td>
+            </tr>`);
+          });
+        }
+      });
+    </script>
+    <script type="module">
+      import QrScanner from "./qr-scanner.min.js";
+      QrScanner.WORKER_PATH = "./qr-scanner-worker.min.js";
+
+      let prev_result = null;
+      const video = document.getElementById('preview');
+      const scanner = new QrScanner(video, result => {
+        if(result && (prev_result != result)){
+          $('#text').val(result);
+          text = result;
+          prev_result = result;
+
+          // render output
+          $('#btn-decode').click();
+          alert('Decode done');
+        }
+      });
+      scanner.start();
+    </script>
+  </body>
+</html>
