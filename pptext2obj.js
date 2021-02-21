@@ -100,7 +100,7 @@ window.PPText2Obj = {
     var merchant_info = obj['62'] || null;
     if(merchant_info != null){
       var merchant_obj = this._decode(merchant_info);
-      for(var k in erchant_obj){
+      for(var k in merchant_obj){
         if(k == '07'){
           obj['62_ref_3'] = merchant_obj[k];
         }
