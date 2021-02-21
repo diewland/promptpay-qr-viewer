@@ -44,7 +44,7 @@
       $('#text').val(text);
 
       function render_obj_table (obj) {
-        let html = '<table>';
+        let html = `<table class='table-sm table-borderless'>`;
         for (let vk in obj) {
           html += `<tr>
             <td>${vk}</td>
