@@ -64,18 +64,17 @@ window.PPText2Obj = {
     var merchant_info = obj['30'] || null;
     if(merchant_info != null){
       var merchant_obj = this._decode(merchant_info);
-      if(merchant_obj['00'] != this.PP_APP_ID_MERCHANT){
-        //return null;
-      }
-      for(var k in merchant_obj){
-        if(k == '01'){
-          obj['30_biller_id'] = merchant_obj[k];
-        }
-        else if(k == '02'){
-          obj['30_merchant_id'] = merchant_obj[k];
-        }
-        else if(k == '03'){
-          obj['30_txn_id'] = merchant_obj[k];
+      if(merchant_obj['00'] == this.PP_APP_ID_MERCHANT){
+        for(var k in merchant_obj){
+          if(k == '01'){
+            obj['30_biller_id'] = merchant_obj[k];
+          }
+          else if(k == '02'){
+            obj['30_merchant_id'] = merchant_obj[k];
+          }
+          else if(k == '03'){
+            obj['30_txn_id'] = merchant_obj[k];
+          }
         }
       }
       obj['30_obj'] = merchant_obj;

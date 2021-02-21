@@ -67,7 +67,7 @@
             if (typeof v == 'object') v = render_obj_table(v);
             $('#output').append(`<tr class='output-row'>
               <td>${k}</td>
-              <td>${v}</td>
+              <td style='word-break: break-all;'>${v}</td>
             </tr>`);
           });
         }
