@@ -43,6 +43,18 @@
       let text = "00020101021129370016A000000677010111011300668912345675802TH54025053037646304A819";
       $('#text').val(text);
 
+      function render_obj_table (obj) {
+        let html = '<table>';
+        for (let vk in obj) {
+          html += `<tr>
+            <td>${vk}</td>
+            <td>${obj[vk]}</td>
+          </tr>`;
+        }
+        html += '</table>';
+        return html;
+      }
+
       // bind click
       $('#btn-decode').click(() => {
         let t = $('#text').val();
@@ -51,9 +63,11 @@
           let keys = Object.keys(obj).sort();
           $('.output-row').remove();
           keys.forEach((k) => {
+            let v = obj[k];
+            if (typeof v == 'object') v = render_obj_table(v);
             $('#output').append(`<tr class='output-row'>
               <td>${k}</td>
-              <td>${obj[k]}</td>
+              <td>${v}</td>
             </tr>`);
           });
         }

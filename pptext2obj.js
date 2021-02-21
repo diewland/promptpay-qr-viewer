@@ -65,7 +65,7 @@ window.PPText2Obj = {
     if(merchant_info != null){
       var merchant_obj = this._decode(merchant_info);
       if(merchant_obj['00'] != this.PP_APP_ID_MERCHANT){
-        return null;
+        //return null;
       }
       for(var k in merchant_obj){
         if(k == '01'){
